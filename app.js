@@ -7,7 +7,7 @@ const PORT = 3000;
 // Do: Add middlewhere.
 app.use(express.json()); // ? Put and Patch are not included yet.
 
-// Todo. #Method 2.
+// Todo. Create handlers for Tours.
 const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -20,8 +20,8 @@ const getAllTours = (req, res) => {
 
 const getTour = (req, res) => {
   const id = req.params.id * 1;
-
   const tour = tours.find((tour) => tour.id === id);
+
   if (!tour)
     return res.status(404).json({
       status: 'fail',
@@ -38,10 +38,8 @@ const getTour = (req, res) => {
 
 const setTour = (req, res) => {
   // Note: In order too do create operation We have to use middlewheres.
-  // Create ID.
   let newID = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({ id: newID }, req.body);
-
   tours.push(newTour);
 
   fs.writeFile(
@@ -58,9 +56,66 @@ const setTour = (req, res) => {
   );
 };
 
-// To call.
+const updateTour = (req, res) => {
+  res.status(500).json({
+    status: 'Panding',
+    message: 'Handler yet to be configured',
+  });
+};
+const deleteTour = (req, res) => {
+  res.status(500).json({
+    status: 'Panding',
+    message: 'Handler yet to be configured',
+  });
+};
+
+// Create Routes.
 app.route('/api/v1/tours').get(getAllTours).post(setTour);
-app.route('/api/v1/tours/:id').get(getTour);
+app
+  .route('/api/v1/tours/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
+
+// Todo: Create and handle routs for user
+const getAllUsers = (req, res) => {
+  res.status(500).json({
+    status: 'Panding',
+    message: 'Handler yet to be configured',
+  });
+};
+const getUser = (req, res) => {
+  res.status(500).json({
+    status: 'Panding',
+    message: 'Handler yet to be configured',
+  });
+};
+const setUser = (req, res) => {
+  res.status(500).json({
+    status: 'Panding',
+    message: 'Handler yet to be configured',
+  });
+};
+const updateUser = (req, res) => {
+  res.status(500).json({
+    status: 'Panding',
+    message: 'Handler yet to be configured',
+  });
+};
+const deleteUser = (req, res) => {
+  res.status(500).json({
+    status: 'Panding',
+    message: 'Handler yet to be configured',
+  });
+};
+
+// Create routes for Users.
+app.route('/api/v1/users').get(getAllUsers).post(setUser);
+app
+  .route('/api/v1/users/:id')
+  .get(getUser)
+  .patch(updateUser)
+  .delete(deleteUser);
 
 // Do: Listening to server.
 app.listen(PORT, () => {
