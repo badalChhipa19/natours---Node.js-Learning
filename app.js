@@ -1,11 +1,13 @@
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
 
 const app = express();
 const PORT = 3000;
 
 // Do: Add middlewhere.
-app.use(express.json()); // ? Put and Patch are not included yet.
+app.use(express.json());
+app.use(morgan('dev'));
 
 // Todo. Create handlers for Tours.
 const getAllTours = (req, res) => {
