@@ -8,6 +8,16 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+exports.checkID = (req, res, next, val) => {
+  if (val * 1 > tours.length)
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+
+  next();
+};
+
 // Create Controllers/handlers to handle tours related queries.
 exports.getAllTours = (req, res) => {
   res.status(200).json({
@@ -30,14 +40,14 @@ exports.getTour = (req, res) => {
     });
 
   res.status(200).json({
-    ststus: 'success',
+    status: 'success',
     data: {
       tour,
     },
   });
 };
 
-exports.setTour = (req, res) => {
+exports.createTour = (req, res) => {
   let newID = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({ id: newID }, req.body);
   tours.push(newTour);
@@ -49,7 +59,7 @@ exports.setTour = (req, res) => {
       res.status(201).json({
         status: 'success',
         data: {
-          tours,
+          newTour,
         },
       });
     }
@@ -58,14 +68,14 @@ exports.setTour = (req, res) => {
 
 exports.updateTour = (req, res) => {
   res.status(500).json({
-    status: 'Panding',
+    status: 'Pending',
     message: 'Handler yet to be configured',
   });
 };
 
 exports.deleteTour = (req, res) => {
   res.status(500).json({
-    status: 'Panding',
+    status: 'Pending',
     message: 'Handler yet to be configured',
   });
 };
