@@ -4,14 +4,22 @@
 const Tour = require('../models/toursModel');
 
 // Create Controllers/handlers to handle tours related queries.
-exports.getAllTours = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    //   results: tours.length,
-    //   data: {
-    //     tours,
-    //   },
-  });
+exports.getAllTours = async (req, res) => {
+  try {
+    const tours = await Tour.find();
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: {
+        tours,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
 
 exports.getTour = (req, res) => {
