@@ -1,69 +1,51 @@
 /**
- * External dependencies.
+ * Internal Dependencies
  */
-const fs = require('fs');
-
-// Read data from files.
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-);
-
-exports.checkID = (req, res, next, val) => {
-  if (val * 1 > tours.length)
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-
-  next();
-};
+const Tour = require('../models/toursModel');
 
 // Create Controllers/handlers to handle tours related queries.
 exports.getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
-    results: tours.length,
-    data: {
-      tours,
-    },
+    //   results: tours.length,
+    //   data: {
+    //     tours,
+    //   },
   });
 };
 
 exports.getTour = (req, res) => {
-  const id = req.params.id * 1;
-  const tour = tours.find((tour) => tour.id === id);
-
-  if (!tour)
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
+  // const id = req.params.id * 1;
+  // const tour = tours.find((tour) => tour.id === id);
+  // if (!tour)
+  //   return res.status(404).json({
+  //     status: 'fail',
+  //     message: 'Invalid ID',
+  //   });
+  // res.status(200).json({
+  //   status: 'success',
+  //   data: {
+  //     tour,
+  //   },
+  // });
 };
 
-exports.createTour = (req, res) => {
-  let newID = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newID }, req.body);
-  tours.push(newTour);
+exports.createTour = async (req, res) => {
+  try {
+    const newTour = await Tour.create(req.body);
 
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          newTour,
-        },
-      });
-    }
-  );
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tour: newTour,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
 
 exports.updateTour = (req, res) => {
