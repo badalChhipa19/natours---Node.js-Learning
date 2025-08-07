@@ -20,7 +20,15 @@ exports.getAllTours = async (req, res) => {
       queryString.replace(/\b(lte|lt|gte|gt)\b/g, (match) => `$${match}`),
     );
 
-    const query = Tour.find(queryString);
+    let query = Tour.find(queryString);
+
+    // 3. Sort.
+    if (req.query.sort) {
+      const sortQuery = req.query.sort.split(',').join(' ');
+      query = query.sort(sortQuery);
+    } else {
+      query = query.sort('createdAt');
+    }
 
     // Get Tours and send response.
     const tours = await query;
