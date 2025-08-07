@@ -3,7 +3,6 @@
  */
 const express = require('express');
 const morgan = require('morgan');
-const qs = require('qs');
 
 /**
  * Internal Dependencies
@@ -20,7 +19,7 @@ if (process.env.NODE_ENV === 'developer') {
 }
 
 app.use(express.json());
-app.set('query parser', (str) => qs.parse(str));
+app.set('query parser', 'extended');
 
 app.use('/api/v1/tours', toursRoute);
 app.use('/api/v1/users', usersRoute);
