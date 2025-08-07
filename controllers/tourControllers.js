@@ -38,6 +38,19 @@ exports.getAllTours = async (req, res) => {
       query = query.select('-__v');
     }
 
+    //5. Pagination.
+    const pageNumber = Number(req.query.page) || 1;
+    const itemPerPage = Number(req.query.limit) || 10;
+    const itemsToSkip = (pageNumber - 1) * itemPerPage;
+
+    query = query.skip(itemsToSkip).limit(itemPerPage);
+
+    if (req.query.page) {
+      const itemCount = await Tour.countDocuments(queryString);
+      if (itemsToSkip >= itemCount)
+        throw new Error('Page limit exceeded beyond available items');
+    }
+
     // Get Tours and send response.
     const tours = await query;
     res.status(200).json({
