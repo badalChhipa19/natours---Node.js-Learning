@@ -6,7 +6,24 @@ const Tour = require('../models/toursModel');
 // Create Controllers/handlers to handle tours related queries.
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    // Do: Filtering.
+    // 1. get query params.
+    const queryObj = { ...req.query };
+
+    // 2. remove special queries. - Filtering
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    // 2.1 Advance Filtering.
+    let queryString = JSON.stringify(queryObj);
+    queryString = JSON.parse(
+      queryString.replace(/\b(lte|lt|gte|gt)\b/g, (match) => `$${match}`),
+    );
+
+    const query = Tour.find(queryString);
+
+    // Get Tours and send response.
+    const tours = await query;
     res.status(200).json({
       status: 'success',
       results: tours.length,
@@ -81,7 +98,6 @@ exports.updateTour = async (req, res) => {
 exports.deleteTour = async (req, res) => {
   try {
     const tour = await Tour.findByIdAndDelete(req.params.id);
-    console.log('Request param: ', req.params.id);
 
     res.status(200).json({
       status: 'success',
