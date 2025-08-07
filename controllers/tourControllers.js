@@ -3,9 +3,18 @@
  */
 const Tour = require('../models/toursModel');
 
-// Create Controllers/handlers to handle tours related queries.
+//Do: Create Controllers/handlers to handle tours related queries.
+// Crete alias Tours middleware.
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
+
 exports.getAllTours = async (req, res) => {
   try {
+    console.log(req.query);
     // Do: Filtering.
     // 1. get query params.
     const queryObj = { ...req.query };
@@ -27,7 +36,7 @@ exports.getAllTours = async (req, res) => {
       const sortQuery = req.query.sort.split(',').join(' ');
       query = query.sort(sortQuery);
     } else {
-      query = query.sort('createdAt');
+      query = query.sort('createdAt,-price');
     }
 
     //4. Select Fields.
