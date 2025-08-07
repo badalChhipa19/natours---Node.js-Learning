@@ -2,6 +2,7 @@
  * Internal Dependencies
  */
 const Tour = require('../models/toursModel');
+const APIFeatures = require('../utils/apiFeatures');
 
 //Do: Create Controllers/handlers to handle tours related queries.
 // Crete alias Tours middleware.
@@ -24,53 +25,15 @@ exports.aliasTopTours = (req, res, next) => {
 
 exports.getAllTours = async (req, res) => {
   try {
-    // Do: Filtering.
-    // 1. get query params.
-    const queryObj = { ...req.query };
-
-    // 2. remove special queries. - Filtering
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach((el) => delete queryObj[el]);
-
-    // 2.1 Advance Filtering.
-    let queryString = JSON.stringify(queryObj);
-    queryString = JSON.parse(
-      queryString.replace(/\b(lte|lt|gte|gt)\b/g, (match) => `$${match}`),
-    );
-
-    let query = Tour.find(queryString);
-
-    // 3. Sort.
-    if (req.query.sort) {
-      const sortQuery = req.query.sort.split(',').join(' ');
-      query = query.sort(sortQuery);
-    } else {
-      query = query.sort('createdAt,-price');
-    }
-
-    //4. Select Fields.
-    if (req.query.fields) {
-      const selectedFields = req.query.fields.split(',').join(' ');
-      query = query.select(selectedFields);
-    } else {
-      query = query.select('-__v');
-    }
-
-    //5. Pagination.
-    const pageNumber = Number(req.query.page) || 1;
-    const itemPerPage = Number(req.query.limit) || 10;
-    const itemsToSkip = (pageNumber - 1) * itemPerPage;
-
-    query = query.skip(itemsToSkip).limit(itemPerPage);
-
-    if (req.query.page) {
-      const itemCount = await Tour.countDocuments(queryString);
-      if (itemsToSkip >= itemCount)
-        throw new Error('Page limit exceeded beyond available items');
-    }
+    const features = new APIFeatures(Tour, req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
 
     // Get Tours and send response.
-    const tours = await query;
+    const tours = await features.query;
+
     res.status(200).json({
       status: 'success',
       results: tours.length,
