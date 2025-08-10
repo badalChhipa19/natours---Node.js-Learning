@@ -58,6 +58,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -71,19 +75,14 @@ tourSchema.virtual('durationWeeks').get(function () {
 
 // DO: Test of middlewares/hooks* in DB.
 tourSchema.pre('save', function () {
-  setTimeout(() => {
-    this.slug = sligify(this.name, { lower: true });
-  }, 2000);
-  console.log(`Slug is: ${this.slug}`);
-});
+  this.slug = sligify(this.name, { lower: true });
+}); // Note: This kind of hooks are called document hooks as these are executed for manipulating the document before saving it to the database.
 
-// tourSchema.pre('save', function () {
-//   console.log(`Will save document: ${this.name}`);
-// });
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
 
-// tourSchema.post('save', (doc) => {
-//   console.log(`Document saved: ${doc}`);
-// });
+  next();
+}); // Note: This is a query middleware, which means it will run before any find query that starts with 'find'. we also have post hooks, which run after the query is executed.
 
 const Tour = mongoose.model('Tour', tourSchema);
 
