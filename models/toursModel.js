@@ -77,13 +77,13 @@ tourSchema.pre('save', function () {
   console.log(`Slug is: ${this.slug}`);
 });
 
-tourSchema.pre('save', function () {
-  console.log(`Will save document: ${this.name}`);
-});
+// tourSchema.pre('save', function () {
+//   console.log(`Will save document: ${this.name}`);
+// });
 
-tourSchema.post('save', (doc) => {
-  console.log(`Document saved: ${doc}`);
-});
+// tourSchema.post('save', (doc) => {
+//   console.log(`Document saved: ${doc}`);
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
