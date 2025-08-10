@@ -2,6 +2,7 @@
  * External Dependencies
  */
 const mongoose = require('mongoose');
+const sligify = require('slugify');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -11,6 +12,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    slug: String,
     durations: {
       type: Number,
       require: [true, 'A tour must have specified duration'],
@@ -65,6 +67,22 @@ const tourSchema = new mongoose.Schema(
 
 tourSchema.virtual('durationWeeks').get(function () {
   return this.durations / 7;
+});
+
+// DO: Test of middlewares/hooks* in DB.
+tourSchema.pre('save', function () {
+  setTimeout(() => {
+    this.slug = sligify(this.name, { lower: true });
+  }, 2000);
+  console.log(`Slug is: ${this.slug}`);
+});
+
+tourSchema.pre('save', function () {
+  console.log(`Will save document: ${this.name}`);
+});
+
+tourSchema.post('save', (doc) => {
+  console.log(`Document saved: ${doc}`);
 });
 
 const Tour = mongoose.model('Tour', tourSchema);
