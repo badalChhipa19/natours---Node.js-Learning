@@ -127,7 +127,7 @@ exports.deleteTour = async (req, res) => {
 exports.getTourStats = async (req, res) => {
   try {
     const stats = await Tour.aggregate([
-      // { $match: { ratingAverage: { $gte: 4 } } }, // For some reason this part is not working.
+      { $match: { ratingAverage: { $gte: 4.5 } } },
       {
         $group: {
           _id: { $toUpper: '$difficulty' },

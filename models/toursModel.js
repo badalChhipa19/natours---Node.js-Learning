@@ -84,6 +84,14 @@ tourSchema.pre(/^find/, function (next) {
   next();
 }); // Note: This is a query middleware, which means it will run before any find query that starts with 'find'. we also have post hooks, which run after the query is executed.
 
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({
+    $match: { secretTour: { $ne: true } },
+  });
+
+  next();
+});
+
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
