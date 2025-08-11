@@ -43,7 +43,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val) {
+          return val <= this.price;
+        },
+        message: 'Discount price ({VALUE}) should be below regular price',
+      },
+      // Note: THis custom valuator will only work on create and save, not on update.
+    },
     summery: {
       type: String,
       trim: true,
