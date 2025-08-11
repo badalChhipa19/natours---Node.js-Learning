@@ -9,6 +9,8 @@ const morgan = require('morgan');
  */
 const usersRoute = require('./routes/userRoutes');
 const toursRoute = require('./routes/tourRoutes');
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
 
 // Initialize the app.
 const app = express();
@@ -27,10 +29,9 @@ app.use('/api/v1/users', usersRoute);
 
 // Handle 404 errors.
 app.all('/{*splat}', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Cannot find ${req.originalUrl} on this server!`,
-  });
+  next(new AppError(`Cannot find ${req.originalUrl} on this server!`, 404));
 });
+
+app.use(globalErrorHandler);
 
 module.exports = app;
