@@ -19,9 +19,18 @@ if (process.env.NODE_ENV === 'developer') {
 }
 
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`));
 app.set('query parser', 'extended');
 
 app.use('/api/v1/tours', toursRoute);
 app.use('/api/v1/users', usersRoute);
+
+// Handle 404 errors.
+app.all('/{*splat}', (req, res, next) => {
+  res.status(404).json({
+    status: 'fail',
+    message: `Cannot find ${req.originalUrl} on this server!`,
+  });
+});
 
 module.exports = app;
