@@ -2,6 +2,13 @@
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
+process.on('uncaughtException', (err) => {
+  console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  console.log(err.name, err.message);
+  process.exitCode = 1;
+  process.exit();
+});
+
 dotenv.config();
 /**
  * Internal Dependencies
@@ -23,7 +30,16 @@ mongoose
   });
 
 // Listen to server.
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log('\x1b[34m');
   console.log(`Listening at port ${PORT}...`);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+  console.log(err.name, err.message);
+
+  server.close(() => {
+    process.exit(1);
+  });
 });
