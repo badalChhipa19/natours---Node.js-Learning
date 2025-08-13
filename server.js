@@ -20,14 +20,10 @@ const { PORT, DB_PASSWORD } = process.env;
 const DB = process.env.DB.replace('<DB_PASSWORD>', DB_PASSWORD);
 
 // Connect with DB.
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-  })
-  .then(() => {
-    console.log('DB Connected...');
-    console.log('\x1b[0m');
-  });
+mongoose.connect(DB).then(() => {
+  console.log('DB Connected...');
+  console.log('\x1b[0m');
+});
 
 // Listen to server.
 const server = app.listen(PORT, () => {
@@ -43,3 +39,5 @@ process.on('unhandledRejection', (err) => {
     process.exit(1);
   });
 });
+
+console.log('Module Data', module);
