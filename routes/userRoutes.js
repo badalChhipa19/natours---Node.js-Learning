@@ -12,11 +12,13 @@ const {
   setUser,
   updateUser,
   deleteUser,
-} = require('./../controllers/userControllers');
+} = require('../controllers/userControllers');
+const { signup } = require('../controllers/authController');
 
 // Create a users Router.
-const usersRoute = express.Router();
-usersRoute.route('/').get(getAllUsers).post(setUser);
-usersRoute.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
+const router = express.Router();
+router.route('/signup').post(signup);
+router.route('/').get(getAllUsers).post(setUser);
+router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 
-module.exports = usersRoute;
+module.exports = router;
