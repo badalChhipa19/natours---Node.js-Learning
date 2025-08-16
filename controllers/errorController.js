@@ -49,16 +49,26 @@ const sendErrorProd = (err, res) => {
   }
 };
 
-module.exports = (err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
+// User authorization Errors.
+const handleJWTErrorDB = () =>
+  new AppError(
+    'Bad Credentials! Please try again with correct credentials',
+    401,
+  );
 
+const handleJWTTimeExpiredErrorDB = () =>
+  new AppError('Your season has expired! Please log in again.', 401);
+
+module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV.trim() === 'production') {
     if (err.name === 'CastError') err = handleCastErrorDB(err);
     if (err.code === 11000) err = handleDuplicateFieldsDB(err);
     if (err.name === 'ValidationError') err = handleValidationErrorDB(err);
+    if (err.message.startsWith('JsonWebTokenError')) err = handleJWTErrorDB();
+    if (err.message.startsWith('TokenExpiredError'))
+      err = handleJWTTimeExpiredErrorDB();
 
     sendErrorProd(err, res);
   }
