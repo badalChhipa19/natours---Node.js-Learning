@@ -61,6 +61,7 @@ const handleJWTTimeExpiredErrorDB = () =>
 
 module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
+    err = new AppError(err, err.statusCode);
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV.trim() === 'production') {
     if (err.name === 'CastError') err = handleCastErrorDB(err);
