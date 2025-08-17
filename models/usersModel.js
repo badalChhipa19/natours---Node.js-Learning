@@ -17,7 +17,11 @@ const userSchema = mongoose.Schema({
   photo: {
     type: String,
     default: 'https://example.com/default-photo.png',
-    minlength: 8,
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin', 'lead-guide'],
+    default: 'user',
   },
   password: {
     type: String,
@@ -32,9 +36,10 @@ const userSchema = mongoose.Schema({
       validator: function (el) {
         return el === this.password;
       },
-      message: 'Passwords are not the same!',
+      message: "Password and confirm password aren't the same!",
     },
   },
+  passwordChangedAt: Date,
 });
 
 userSchema.pre('save', async function (next) {
