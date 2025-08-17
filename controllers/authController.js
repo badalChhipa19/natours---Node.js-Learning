@@ -11,11 +11,27 @@ const User = require('../models/usersModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+/**
+ * Sign JWT Token.
+ *
+ * @param {string} id - User ID.
+ *
+ * @return {string} - Signed JWT token.
+ */
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+/**
+ * User Signup Handler.
+ *
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * @param {Function} next - Next middleware function.
+ *
+ * @return {Promise<void>} - Returns a promise that resolves to void.
+ */
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -35,6 +51,15 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * User Login Handler.
+ *
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * @param {Function} next - Next middleware function.
+ *
+ * @return {Promise<void>} - Returns a promise that resolves to void.
+ */
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -54,6 +79,15 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Validate JWT Token.
+ *
+ * @param {string} token - JWT token to validate.
+ * @param {string} secrets - Secret key to verify the token.
+ * @return {Promise<Object>} - Returns a promise that resolves to the decoded token.
+ *
+ * @return {Promise<Object>} - Returns a promise that resolves to the decoded token.
+ */
 const validateToken = (token, secrets) =>
   new Promise((resolve, reject) => {
     try {
@@ -64,6 +98,15 @@ const validateToken = (token, secrets) =>
     }
   });
 
+/**
+ * Protect Middleware.
+ *
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * @param {Function} next - Next middleware function.
+ *
+ * @return {Promise<void>} - Returns a promise that resolves to void.
+ */
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check if it's there
   let token;
@@ -108,6 +151,13 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+/**
+ * Restrict Access to Certain Roles.
+ *
+ * @param {...string} roles - Roles that are allowed to access the route.
+ *
+ * @return {Function} - Middleware function that checks user role.
+ */
 exports.restrictedAction =
   (...roles) =>
   (req, res, next) => {
