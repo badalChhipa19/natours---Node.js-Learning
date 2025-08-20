@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
+const crypt = require('crypto');
 
 const userSchema = mongoose.Schema({
   name: {
@@ -30,7 +31,7 @@ const userSchema = mongoose.Schema({
   },
   confirmPassword: {
     type: String,
-    // required: [true, 'Please confirm your password'],
+    required: [true, 'Please confirm your password'],
     validate: {
       // This only works on CREATE and SAVE!!!
       validator: function (el) {
@@ -56,6 +57,12 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 userSchema.methods.isPasswordChanged = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
@@ -74,6 +81,30 @@ userSchema.methods.correctPassword = async function (
   userPassword,
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+/**
+ * Create Password Reset Token.
+ *
+ * @returns {string} - The hashed token.
+ */
+userSchema.methods.createPasswordResetToken = function () {
+  // Generate a random token.
+  const resetToken = crypt.randomBytes(16).toString('hex');
+
+  // Hash the token and set it to passwordResetToken field.
+  this.passwordResetToken = crypt
+    .createHash('SHA256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set the expiration time for the token.
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  console.log('Reset Token:', { resetToken }, this.passwordResetToken);
+
+  // Return the plain token.
+  return resetToken;
 };
 
 const User = mongoose.model('Users', userSchema);
