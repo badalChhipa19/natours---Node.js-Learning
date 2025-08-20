@@ -1,4 +1,9 @@
 /**
+ * @module authController
+ * @description Contains authentication and authorization logic for user management.
+ */
+
+/**
  * External Dependencies
  */
 const jwt = require('jsonwebtoken');
@@ -13,7 +18,7 @@ const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 
 /**
- * Sign JWT Token.
+ * @function Sign JWT token.
  *
  * @param {string} id - User ID.
  *
@@ -44,13 +49,16 @@ const createAndSendToken = (user, statusCode, res) => {
 };
 
 /**
- * User Signup Handler.
+ * @async
+ * @function signup.
+ * @description Registers a new user and sends back a JWT token.
  *
- * @param {Object} req - Request object.
- * @param {Object} res - Response object.
- * @param {Function} next - Next middleware function.
+ * @param {Object} req - Express request object containing user data.
+ * @param {Object} res - Express response object used to send response.
+ * @param {Function} next - Express next middleware function.
  *
- * @return {Promise<void>} - Returns a promise that resolves to void.
+ * @returns {Promise<void>}
+ * @throws {AppError} If user creation fails or validation errors occur.
  */
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
@@ -65,13 +73,16 @@ exports.signup = catchAsync(async (req, res, next) => {
 });
 
 /**
- * User Login Handler.
+ * @async
+ * @function login
+ * @description Authenticates user credentials and returns a JWT token.
  *
- * @param {Object} req - Request object.
- * @param {Object} res - Response object.
- * @param {Function} next - Next middleware function.
+ * @param {Object} req - Express request object with email and password.
+ * @param {Object} res - Express response object used to send token.
+ * @param {Function} next - Express next middleware function.
  *
- * @return {Promise<void>} - Returns a promise that resolves to void.
+ * @returns {Promise<void>}
+ * @throws {AppError} If credentials are missing or incorrect.
  */
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
@@ -108,13 +119,16 @@ const validateToken = (token, secrets) =>
   });
 
 /**
- * Protect Middleware.
+ * @async
+ * @function protect
+ * @description Middleware to protect routes by verifying JWT token.
  *
- * @param {Object} req - Request object.
- * @param {Object} res - Response object.
- * @param {Function} next - Next middleware function.
+ * @param {Object} req - Express request object with authorization header.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
  *
- * @return {Promise<void>} - Returns a promise that resolves to void.
+ * @returns {Promise<void>}
+ * @throws {AppError} If token is missing, invalid, or user no longer exists.
  */
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check if it's there.
@@ -161,11 +175,12 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Restrict Access to Certain Roles.
+ * @function restrictTo
+ * @description Middleware to restrict access based on user roles.
  *
- * @param {...string} roles - Roles that are allowed to access the route.
+ * @param {...string} roles - Allowed roles (e.g., 'admin', 'lead-guide').
  *
- * @return {Function} - Middleware function that checks user role.
+ * @returns {Function} Express middleware function.
  */
 exports.restrictedAction =
   (...roles) =>
@@ -181,13 +196,16 @@ exports.restrictedAction =
   };
 
 /**
- * Forgot Password Handler.
+ * @async
+ * @function forgotPassword
+ * @description Sends password reset token to user's email.
  *
- * @param {Object} req - Request object.
- * @param {Object} res - Response object.
- * @param {Function} next - Next middleware function.
+ * @param {Object} req - Express request object with user's email.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
  *
- * @return {Promise<void>} - Returns a promise that resolves to void.
+ * @returns {Promise<void>}
+ * @throws {AppError} If user not found or email sending fails.
  */
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // Check if email is provided.
@@ -236,13 +254,16 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Reset Password Handler.
+ * @async
+ * @function resetPassword
+ * @description Resets user's password using the token from email.
  *
- * @param {Object} req - Request object.
- * @param {Object} res - Response object.
- * @param {Function} next - Next middleware function.
+ * @param {Object} req - Express request object with token and new password.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
  *
- * @return {Promise<void>} - Returns a promise that resolves to void.
+ * @returns {Promise<void>}
+ * @throws {AppError} If token is invalid or expired.
  */
 exports.resetPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
@@ -279,13 +300,16 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Update Password Handler.
+ * @async
+ * @function updatePassword
+ * @description Allows logged-in users to update their password.
  *
- * @param {Object} req - Request object.
- * @param {Object} res - Response object.
- * @param {Function} next - Next middleware function.
+ * @param {Object} req - Express request object with current and new passwords.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
  *
- * @return {Promise<void>} - Returns a promise that resolves to void.
+ * @returns {Promise<void>}
+ * @throws {AppError} If current password is incorrect or update fails.
  */
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) Get user from collection
