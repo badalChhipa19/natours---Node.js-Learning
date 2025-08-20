@@ -37,7 +37,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-    passwordConfirm: req.body.confirmPassword,
+    confirmPassword: req.body.confirmPassword,
+    role: req.body.role,
   });
 
   const token = signToken(newUser._id);
