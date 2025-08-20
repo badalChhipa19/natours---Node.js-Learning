@@ -2,7 +2,6 @@
  * External Dependencies
  */
 const jwt = require('jsonwebtoken');
-// const { promisify } = require('util');
 const crypt = require('crypto');
 
 /**
@@ -26,6 +25,25 @@ const signToken = (id) =>
   });
 
 /**
+ * Create and send JWT token to the client.
+ *
+ * @param {Object} user - User object.
+ * @param {number} statusCode - HTTP status code.
+ * @param {Object} res - Response object.
+ *
+ */
+const createAndSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
+/**
  * User Signup Handler.
  *
  * @param {Object} req - Request object.
@@ -43,15 +61,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createAndSendToken(newUser, 201, res);
 });
 
 /**
@@ -75,11 +85,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createAndSendToken(user, 200, res);
 });
 
 /**
@@ -111,7 +117,7 @@ const validateToken = (token, secrets) =>
  * @return {Promise<void>} - Returns a promise that resolves to void.
  */
 exports.protect = catchAsync(async (req, res, next) => {
-  // 1) Getting token and check if it's there
+  // 1) Getting token and check if it's there.
   let token;
   if (
     req.headers.authorization &&
@@ -269,9 +275,33 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 3) Update changedPasswordAt property for the user
   // (This is handled by the pre-save hook in the user model)
   // 4) Log the user in, send JWT
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createAndSendToken(user, 200, res);
+});
+
+/**
+ * Update Password Handler.
+ *
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * @param {Function} next - Next middleware function.
+ *
+ * @return {Promise<void>} - Returns a promise that resolves to void.
+ */
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from collection
+  const user = await User.findById(req.user.id).select('+password');
+  console.log('Updating password for user:', req.user);
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+  // 2) Check if POSTed current password is correct
+  if (!(await user.correctPassword(req.body.currentPassword, user.password))) {
+    return next(new AppError('Your current password is wrong.', 401));
+  }
+  // 3) If so, update password
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  await user.save(); // This will trigger the pre-save hook to hash the password
+  // 4) Log user in, send JWT
+  createAndSendToken(user, 200, res);
 });
