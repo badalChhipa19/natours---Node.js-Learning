@@ -175,7 +175,13 @@ exports.restrictedAction =
   };
 
 /**
- * Export the Auth Controller.
+ * Forgot Password Handler.
+ *
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * @param {Function} next - Next middleware function.
+ *
+ * @return {Promise<void>} - Returns a promise that resolves to void.
  */
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // Check if email is provided.
@@ -193,8 +199,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // Generate a reset token and save it to the user.
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
-
-  console.log(user, resetToken);
 
   const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
 
@@ -221,11 +225,19 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    tempToken: resetToken,
     message: 'Token sent to email!',
   });
 });
 
+/**
+ * Reset Password Handler.
+ *
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * @param {Function} next - Next middleware function.
+ *
+ * @return {Promise<void>} - Returns a promise that resolves to void.
+ */
 exports.resetPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
   const hashedToken = crypt
@@ -241,7 +253,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError('Token is invalid or has expired', 400));
   }
-  console.log('user found:', req.body);
 
   if (!req.body || !req.body.password || !req.body.confirmPassword) {
     return next(
