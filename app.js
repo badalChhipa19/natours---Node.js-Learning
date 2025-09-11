@@ -4,6 +4,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 /**
  * Internal Dependencies
@@ -12,6 +13,17 @@ const usersRoute = require('./routes/userRoutes');
 const toursRoute = require('./routes/tourRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+
+// Set security HTTP headers.
+app.use(helmet());
+
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!',
+});
+
+app.use('/api', limiter);
 
 // Initialize the app.
 const app = express();
@@ -25,13 +37,6 @@ app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 app.set('query parser', 'extended');
 
-const limiter = rateLimit({
-  max: 100,
-  windowMs: 60 * 60 * 1000,
-  message: 'Too many requests from this IP, please try again in an hour!',
-});
-
-app.use('/api', limiter);
 app.use('/api/v1/tours', toursRoute);
 app.use('/api/v1/users', usersRoute);
 
