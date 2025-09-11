@@ -68,7 +68,7 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-userSchema.pre('find', function (next) {
+userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });
   next();
 });
@@ -110,8 +110,6 @@ userSchema.methods.createPasswordResetToken = function () {
 
   // Set the expiration time for the token.
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-
-  console.log('Reset Token:', { resetToken }, this.passwordResetToken);
 
   // Return the plain token.
   return resetToken;
