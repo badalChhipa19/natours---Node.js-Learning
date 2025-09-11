@@ -5,6 +5,7 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const sanitization = require('express-mongo-sanitize');
 
 /**
  * Internal Dependencies
@@ -14,8 +15,12 @@ const toursRoute = require('./routes/tourRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
+// Initialize the app.
+const app = express();
+
 // Set security HTTP headers.
 app.use(helmet());
+app.use(sanitization());
 
 const limiter = rateLimit({
   max: 100,
@@ -24,9 +29,6 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter);
-
-// Initialize the app.
-const app = express();
 
 // Add middleware.
 if (process.env.NODE_ENV === 'developer') {
