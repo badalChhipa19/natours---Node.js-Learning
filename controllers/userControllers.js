@@ -93,9 +93,12 @@ exports.updateUser = (req, res) => {
     message: 'Handler yet to be configured',
   });
 };
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'Pending',
-    message: 'Handler yet to be configured',
+
+exports.deleteUser = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
   });
-};
+});
