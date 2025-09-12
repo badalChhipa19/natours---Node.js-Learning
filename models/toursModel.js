@@ -101,6 +101,12 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Users',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -122,6 +128,14 @@ tourSchema.pre(/^find/, function (next) {
 
   next();
 }); // Note: This is a query middleware, which means it will run before any find query that starts with 'find'. we also have post hooks, which run after the query is executed.
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+  next();
+});
 
 tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({
