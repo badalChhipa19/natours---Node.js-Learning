@@ -13,6 +13,7 @@ const helmet = require('helmet');
  */
 const usersRoute = require('./routes/userRoutes');
 const toursRoute = require('./routes/tourRoutes');
+const reviewRoute = require('./routes/reviewRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -43,6 +44,7 @@ app.set('query parser', 'extended');
 
 app.use('/api/v1/tours', toursRoute);
 app.use('/api/v1/users', usersRoute);
+app.use('/api/v1/reviews', reviewRoute);
 
 // Handle 404 errors.
 app.all('/{*splat}', (req, res, next) => {
