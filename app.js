@@ -5,7 +5,8 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-const sanitization = require('express-mongo-sanitize');
+// const sanitization = require('express-mongo-sanitize');
+// const hpp = require('hpp');
 
 /**
  * Internal Dependencies
@@ -20,7 +21,6 @@ const app = express();
 
 // Set security HTTP headers.
 app.use(helmet());
-app.use(sanitization());
 
 const limiter = rateLimit({
   max: 100,
@@ -38,6 +38,8 @@ if (process.env.NODE_ENV === 'developer') {
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 app.set('query parser', 'extended');
+// app.use(sanitization());
+// app.use(hpp());
 
 app.use('/api/v1/tours', toursRoute);
 app.use('/api/v1/users', usersRoute);
