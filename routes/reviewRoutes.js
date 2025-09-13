@@ -8,6 +8,7 @@ const express = require('express');
  */
 const {
   getAllReviews,
+  setTourAndUserIds,
   createReview,
   deleteReview,
   updateReview,
@@ -21,7 +22,7 @@ const router = express.Router({ mergeParams: true });
 router
   .route('/')
   .get(getAllReviews)
-  .post(protect, restrictedAction('user'), createReview);
+  .post(protect, restrictedAction('user'), setTourAndUserIds, createReview);
 
 router
   .route('/:id')

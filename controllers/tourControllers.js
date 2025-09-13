@@ -60,23 +60,8 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createTour = catchAsync(async (req, res, next) => {
-  const tour = await Tours.create(req.body);
-
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
-
+exports.createTour = factory.createOne(Tours);
 exports.updateTour = factory.updateOne(Tours);
-
 exports.deleteTour = factory.deleteOne(Tours);
 
 // Aggregation pipeline example.
