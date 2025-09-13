@@ -9,25 +9,21 @@ const factory = require('./controllerFactory');
 //Do: Create Controllers/handlers to handle tours related queries.
 // Crete alias Tours middleware.
 exports.aliasTopTours = (req, res, next) => {
-  // Set default query parameters for top tours.
-  req.query = {
-    ...req.query,
-    limit: req.query.limit || '5',
-    sort: req.query.sort || '-ratingsAverage,price',
-    fields: req.query.fields || 'name,price,ratingsAverage,summary,difficulty',
-  };
+  // Note: Setting query params like this no longer supported as you can modify URL itself.
+  // req.query = {
+  //   ...req.query,
+  //   limit: req.query.limit || '5',
+  //   sort: req.query.sort || '-ratingsAverage,price',
+  //   fields: req.query.fields || 'name,price,ratingsAverage,summary,difficulty',
+  // };
 
-  // Note: If you want to set default values for query params, you can also do it like this too.
-  // req.query.limit = '5';
-  // req.query.sort = '-ratingsAverage,price';
-  // req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  req.url +=
+    '?limit=5&sort=-ratingsAverage,price&fields=name,price,ratingsAverage,summary,difficulty';
 
   next();
 };
 
 exports.getAllTours = catchAsync(async (req, res, next) => {
-  console.log(req.query);
-
   const features = new APIFeatures(Tours, req.query)
     .filter()
     .sort()
