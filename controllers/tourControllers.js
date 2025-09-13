@@ -5,6 +5,7 @@ const Tours = require('../models/toursModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./controllerFactory');
 
 //Do: Create Controllers/handlers to handle tours related queries.
 // Crete alias Tours middleware.
@@ -92,20 +93,7 @@ exports.updateTour = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  const tour = await Tours.findByIdAndDelete(req.params.id);
-
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
+exports.deleteTour = factory.deleteOne(Tours);
 
 // Aggregation pipeline example.
 exports.getTourStats = catchAsync(async (req, res, next) => {

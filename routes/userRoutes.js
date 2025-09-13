@@ -11,6 +11,7 @@ const {
   getUser,
   updateCurrentUserData,
   deleteMe,
+  deleteUser,
 } = require('../controllers/userControllers');
 const {
   signup,
@@ -19,6 +20,7 @@ const {
   resetPassword,
   updatePassword,
   protect,
+  restrictedAction,
 } = require('../controllers/authController');
 
 // Create a users Router.
@@ -32,6 +34,7 @@ router.patch('/resetPassword/:token', resetPassword);
 router.patch('/updatePassword', protect, updatePassword);
 router.patch('/updateCurrentUserData', protect, updateCurrentUserData);
 router.delete('/deleteMe', protect, deleteMe);
+router.delete('/:id', protect, restrictedAction('admin'), deleteUser);
 
 // (old way)
 router.route('/login').post(login);

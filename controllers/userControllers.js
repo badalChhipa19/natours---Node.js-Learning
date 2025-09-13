@@ -9,6 +9,7 @@
 const User = require('../models/usersModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./controllerFactory');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -81,12 +82,14 @@ exports.getUser = (req, res) => {
     message: 'Handler yet to be configured',
   });
 };
+
 exports.setUser = (req, res) => {
   res.status(500).json({
     status: 'Pending',
     message: 'Handler yet to be configured',
   });
 };
+
 exports.updateUser = (req, res) => {
   res.status(500).json({
     status: 'Pending',
@@ -102,3 +105,5 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+exports.deleteUser = factory.deleteOne(User);
