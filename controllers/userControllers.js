@@ -19,42 +19,6 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-/**
- *@function getAllUsers
- * @description Retrieves all users from the database.
- *
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @param {Function} next - Express next middleware function.
- *
- * @returns {Promise<void>}
- * @throws {AppError} If no users are found.
- */
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const user = await User.find();
-
-  if (!user) return next(new AppError('No users found', 404));
-
-  res.status(200).json({
-    status: 'success',
-    results: user.length,
-    data: {
-      user,
-    },
-  });
-});
-
-/**
- * @function updateUserData
- * @description Updates user data for the currently logged-in user.
- *
- * @param {Object} req - Express request object containing user data.
- * @param {Object} res - Express response object.
- * @param {Function} next - Express next middleware function.
- *
- * @returns {Promise<void>}
- * @throws {AppError} If user is not found or update fails.
- */
 exports.updateCurrentUser = catchAsync(async (req, res, next) => {
   const user = await req.user;
   if (!user) return next(new AppError('User not found', 404));
@@ -76,21 +40,12 @@ exports.updateCurrentUser = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'Pending',
-    message: 'Handler yet to be configured',
-  });
-};
-
 exports.setUser = (req, res) => {
   res.status(500).json({
     status: 'Pending',
     message: 'Handler yet to be configured',
   });
 };
-
-exports.updateUser = factory.updateOne(User);
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
@@ -101,4 +56,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getUser = factory.getOne(User);
+exports.getAllUsers = factory.getAll(User);
+exports.updateUser = factory.updateOne(User);
 exports.deleteUser = factory.deleteOne(User);
