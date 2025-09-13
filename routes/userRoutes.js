@@ -9,9 +9,10 @@ const express = require('express');
 const {
   getAllUsers,
   getUser,
-  updateCurrentUserData,
+  updateCurrentUser,
   deleteMe,
   deleteUser,
+  updateUser,
 } = require('../controllers/userControllers');
 const {
   signup,
@@ -32,13 +33,16 @@ router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
 router.patch('/updatePassword', protect, updatePassword);
-router.patch('/updateCurrentUserData', protect, updateCurrentUserData);
+router.patch('/updateCurrentUserData', protect, updateCurrentUser);
 router.delete('/deleteMe', protect, deleteMe);
-router.delete('/:id', protect, restrictedAction('admin'), deleteUser);
 
 // (old way)
 router.route('/login').post(login);
 router.route('/').get(getAllUsers);
-router.route('/:id').get(getUser);
+router
+  .route('/:id')
+  .get(getUser)
+  .delete(protect, restrictedAction('admin'), deleteUser)
+  .patch(protect, restrictedAction('admin'), updateUser);
 
 module.exports = router;

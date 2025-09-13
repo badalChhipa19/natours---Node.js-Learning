@@ -55,7 +55,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
  * @returns {Promise<void>}
  * @throws {AppError} If user is not found or update fails.
  */
-exports.updateCurrentUserData = catchAsync(async (req, res, next) => {
+exports.updateCurrentUser = catchAsync(async (req, res, next) => {
   const user = await req.user;
   if (!user) return next(new AppError('User not found', 404));
 
@@ -90,12 +90,7 @@ exports.setUser = (req, res) => {
   });
 };
 
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'Pending',
-    message: 'Handler yet to be configured',
-  });
-};
+exports.updateUser = factory.updateOne(User);
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
