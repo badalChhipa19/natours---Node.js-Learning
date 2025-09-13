@@ -13,12 +13,12 @@ const {
 const { protect, restrictedAction } = require('../controllers/authController');
 
 // Create Routes.
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 // Perform operation based on method.
-router.route('/').get(getAllReviews);
 router
-  .route('/addReview')
+  .route('/')
+  .get(getAllReviews)
   .post(protect, restrictedAction('user'), createReview);
 
 module.exports = router;

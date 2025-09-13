@@ -16,11 +16,14 @@ const {
   getTourStats,
   getMonthlyPlan,
 } = require('../controllers/tourControllers');
+const reviewRouter = require('./reviewRoutes');
 
 const { protect, restrictedAction } = require('../controllers/authController');
 
 // Create Routes.
 const router = express.Router();
+
+router.use('/:tourId/review', reviewRouter);
 
 // Perform operation based on method.
 router.route('/top-5-tours').get(aliasTopTours, getAllTours);
